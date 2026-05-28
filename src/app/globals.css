@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  --color-matcha: #5B7C4F;
+  --color-matcha-light: #7A9B6D;
+  --color-matcha-dark: #3D5A35;
+  --color-cream: #FFF8F0;
+  --color-oolong: #C4956A;
+  --color-oolong-light: #D4AD88;
+  --color-charcoal: #2D2D2D;
+  --color-steam: #F5F0EB;
+  --color-sage: #E8E0D4;
+  --background: var(--color-cream);
+  --foreground: var(--color-charcoal);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-matcha: var(--color-matcha);
+  --color-matcha-light: var(--color-matcha-light);
+  --color-matcha-dark: var(--color-matcha-dark);
+  --color-cream: var(--color-cream);
+  --color-oolong: var(--color-oolong);
+  --color-oolong-light: var(--color-oolong-light);
+  --color-charcoal: var(--color-charcoal);
+  --color-steam: var(--color-steam);
+  --color-sage: var(--color-sage);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Order confirmation animations */
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes drawCheck {
+  from {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+  }
+  to {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

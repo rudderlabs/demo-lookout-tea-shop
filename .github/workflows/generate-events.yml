@@ -1,0 +1,44 @@
+name: Generate Analytics Events
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Every 15 minutes
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: 'Number of rounds (each round = 6 customers)'
+        required: false
+        default: '2'
+
+permissions: {}
+
+concurrency:
+  group: generate-events
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e # v2.14.2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 22
+
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install chromium --with-deps
+
+      - name: Generate events
+        env:
+          EVENT_ROUNDS: ${{ inputs.rounds || '2' }}
+        run: node scripts/generate-events.mjs --rounds "$EVENT_ROUNDS"

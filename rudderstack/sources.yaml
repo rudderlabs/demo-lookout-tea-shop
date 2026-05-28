@@ -1,0 +1,9 @@
+version: rudder/v0.1
+kind: event-stream-source
+metadata:
+  name: tea-leafs-web
+spec:
+  id: tea-leafs-web
+  name: Tea Leafs Web
+  type: javascript
+  enabled: true

@@ -2,13 +2,17 @@ name: Generate Analytics Events
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Every 15 minutes
+    - cron: '*/5 * * * *' # Every 5 minutes
   workflow_dispatch:
     inputs:
       rounds:
         description: 'Number of rounds (each round = 6 customers)'
         required: false
         default: '2'
+      base_url:
+        description: 'Override BASE_URL (defaults to the GH Pages deployment)'
+        required: false
+        default: ''
 
 permissions: {}
 
@@ -41,4 +45,5 @@ jobs:
       - name: Generate events
         env:
           EVENT_ROUNDS: ${{ inputs.rounds || '2' }}
-        run: node scripts/generate-events.mjs --rounds "$EVENT_ROUNDS"
+          BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || 'https://rudderlabs.github.io/demo-lookout-tea-shop' }}
+        run: node scripts/generate-events.mjs --rounds "$EVENT_ROUNDS" --base-url "$BASE_URL"

@@ -1,0 +1,4 @@
+.local/
+*.p8
+*.pub
+*-with-key.sql

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,20 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+  const hasTrackedEntry = useRef(false);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    const value = e.target.value;
+    setCode(value);
+    setError('');
+
+    // Fire once on the first keystroke — tracks intent to use a coupon.
+    // Comparing against Coupon Applied / Coupon Denied reveals abandonment rate.
+    if (!hasTrackedEntry.current && value.length > 0 && analytics) {
+      hasTrackedEntry.current = true;
+      trackCouponEntered(analytics, { coupon_id: '' });
+    }
+  }
 
   function handleApply(): void {
     setError('');
@@ -93,6 +108,7 @@ export function CouponInput(): React.JSX.Element {
 
     applyCoupon(found);
     setCode('');
+    hasTrackedEntry.current = false;
 
     if (analytics) {
       trackCouponApplied(analytics, {
@@ -147,10 +163,7 @@ export function CouponInput(): React.JSX.Element {
           id="coupon-code"
           type="text"
           value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            setError('');
-          }}
+          onChange={handleChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
           }}

@@ -71,6 +71,10 @@ export interface CouponPayload {
   reason?: string;
 }
 
+export interface CouponEnteredPayload {
+  coupon_id: string;
+}
+
 export interface PromotionPayload {
   promotion_id: string;
   name: string;

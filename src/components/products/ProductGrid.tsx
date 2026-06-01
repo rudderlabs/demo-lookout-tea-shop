@@ -7,6 +7,7 @@ import type { TeaProduct } from '@/data/schema';
 import {
   toProductPayload,
   trackProductListViewed,
+  trackProductsSearched,
   useRudderAnalytics,
 } from '@/lib/analytics';
 
@@ -23,6 +24,7 @@ export function ProductGrid({
 }: ProductGridProps): React.JSX.Element {
   const analytics = useRudderAnalytics();
   const previousFilterKey = useRef('');
+  const searchDebounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -45,6 +47,7 @@ export function ProductGrid({
     return result;
   }, [products, searchTerm, category]);
 
+  // Track Product List Viewed when filter/search changes and results exist
   useEffect(() => {
     if (!analytics) return;
 
@@ -60,6 +63,30 @@ export function ProductGrid({
       products: filteredProducts.map(toProductPayload),
     });
   }, [analytics, filteredProducts, category, searchTerm]);
+
+  // Track Products Searched with results_count (debounced 300ms).
+  // Fired here (not in SearchBar) because ProductGrid is the only component
+  // that knows how many results the query returned.
+  useEffect(() => {
+    if (!searchTerm.trim() || !analytics) return;
+
+    if (searchDebounceTimer.current) {
+      clearTimeout(searchDebounceTimer.current);
+    }
+
+    searchDebounceTimer.current = setTimeout(() => {
+      trackProductsSearched(analytics, {
+        query: searchTerm.trim(),
+        results_count: filteredProducts.length,
+      });
+    }, 300);
+
+    return () => {
+      if (searchDebounceTimer.current) {
+        clearTimeout(searchDebounceTimer.current);
+      }
+    };
+  }, [analytics, searchTerm, filteredProducts.length]);
 
   if (filteredProducts.length === 0) {
     return (

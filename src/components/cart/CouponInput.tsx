@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntryStarted,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,7 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+  const entryTracked = useRef(false);
 
   function handleApply(): void {
     setError('');
@@ -153,6 +155,15 @@ export function CouponInput(): React.JSX.Element {
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
+          }}
+          onFocus={() => {
+            if (!entryTracked.current && analytics) {
+              entryTracked.current = true;
+              trackCouponEntryStarted(analytics, {
+                cart_value: subtotal,
+                currency: 'USD',
+              });
+            }
           }}
           placeholder="Enter coupon code"
           className="flex-1 rounded-lg border border-sage bg-cream/50 px-3 py-2 text-sm text-charcoal placeholder:text-charcoal/40 focus:border-matcha focus:outline-none focus:ring-1 focus:ring-matcha"

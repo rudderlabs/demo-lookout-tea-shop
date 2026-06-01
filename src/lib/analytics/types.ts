@@ -71,6 +71,11 @@ export interface CouponPayload {
   reason?: string;
 }
 
+export interface CouponEntryStartedPayload {
+  cart_value: number;
+  currency: string;
+}
+
 export interface PromotionPayload {
   promotion_id: string;
   name: string;

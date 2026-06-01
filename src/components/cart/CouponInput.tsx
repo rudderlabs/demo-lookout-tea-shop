@@ -63,7 +63,7 @@ export function CouponInput(): React.JSX.Element {
     // Comparing against Coupon Applied / Coupon Denied reveals abandonment rate.
     if (!hasTrackedEntry.current && value.length > 0 && analytics) {
       hasTrackedEntry.current = true;
-      trackCouponEntered(analytics, { coupon_id: '' });
+      trackCouponEntered(analytics, { coupon_id: value });
     }
   }
 

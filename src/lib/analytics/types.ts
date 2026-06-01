@@ -64,6 +64,10 @@ export interface OrderCompletedPayload {
   checkout_flow?: string;
 }
 
+export interface CouponEnteredPayload {
+  coupon_id: string;
+}
+
 export interface CouponPayload {
   coupon_id: string;
   coupon_name: string;

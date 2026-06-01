@@ -7,6 +7,7 @@ import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,12 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+
+  function handleBlur(): void {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed || !analytics) return;
+    trackCouponEntered(analytics, { coupon_id: trimmed });
+  }
 
   function handleApply(): void {
     setError('');
@@ -151,6 +158,7 @@ export function CouponInput(): React.JSX.Element {
             setCode(e.target.value);
             setError('');
           }}
+          onBlur={handleBlur}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
           }}

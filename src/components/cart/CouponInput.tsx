@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,19 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+
+  // Fire Coupon Entered debounced 500ms after the user stops typing.
+  // Only fires for non-empty, non-whitespace input.
+  useEffect(() => {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) return;
+    const timer = setTimeout(() => {
+      if (analytics) {
+        trackCouponEntered(analytics, { coupon_id: trimmed });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [code, analytics]);
 
   function handleApply(): void {
     setError('');

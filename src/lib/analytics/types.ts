@@ -71,8 +71,10 @@ export interface CouponPayload {
   reason?: string;
 }
 
-export interface CouponEnteredPayload {
-  coupon_id: string;
+/** Fired once when the user begins typing into the coupon input field. */
+export interface CouponCodeEnteredPayload {
+  /** The partial code typed so far (trimmed). Useful for identifying common abandoned prefixes. */
+  coupon_code_partial: string;
 }
 
 export interface PromotionPayload {

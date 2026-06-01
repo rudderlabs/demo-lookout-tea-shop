@@ -10,7 +10,7 @@ import type {
   CartViewedPayload,
   CheckoutStartedPayload,
   CheckoutStepPayload,
-  CouponEnteredPayload,
+  CouponCodeEnteredPayload,
   CouponPayload,
   IdentifyTraits,
   OrderCompletedPayload,
@@ -133,12 +133,12 @@ export function trackCartViewed(
   analytics.track(ECOMMERCE_EVENTS.CART_VIEWED, toApiObject(payload));
 }
 
-export function trackCouponEntered(
+export function trackCouponCodeEntered(
   analytics: RudderAnalytics,
-  payload: CouponEnteredPayload,
+  payload: CouponCodeEnteredPayload,
 ): void {
-  console.log('[Analytics]', ECOMMERCE_EVENTS.COUPON_ENTERED, payload);
-  analytics.track(ECOMMERCE_EVENTS.COUPON_ENTERED, toApiObject(payload));
+  console.log('[Analytics]', ECOMMERCE_EVENTS.COUPON_CODE_ENTERED, payload);
+  analytics.track(ECOMMERCE_EVENTS.COUPON_CODE_ENTERED, toApiObject(payload));
 }
 
 export function trackCouponApplied(

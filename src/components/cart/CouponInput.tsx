@@ -6,8 +6,8 @@ import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
+  trackCouponCodeEntered,
   trackCouponDenied,
-  trackCouponEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -52,18 +52,25 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
-  const hasTrackedEntry = useRef(false);
+  // Guard: fire "Coupon Code Entered" only once per input session
+  const hasTrackedTyping = useRef(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const value = e.target.value;
     setCode(value);
     setError('');
 
-    // Fire once on the first keystroke — tracks intent to use a coupon.
-    // Comparing against Coupon Applied / Coupon Denied reveals abandonment rate.
-    if (!hasTrackedEntry.current && value.length > 0 && analytics) {
-      hasTrackedEntry.current = true;
-      trackCouponEntered(analytics, { coupon_id: value });
+    // Fire once on the first keystroke; reset when the field is cleared
+    if (value.length > 0 && !hasTrackedTyping.current) {
+      hasTrackedTyping.current = true;
+      if (analytics) {
+        trackCouponCodeEntered(analytics, {
+          coupon_code_partial: value.trim(),
+        });
+      }
+    } else if (value.length === 0) {
+      // Reset so a new typing session can be counted if the user clears the field
+      hasTrackedTyping.current = false;
     }
   }
 
@@ -108,7 +115,8 @@ export function CouponInput(): React.JSX.Element {
 
     applyCoupon(found);
     setCode('');
-    hasTrackedEntry.current = false;
+    // Reset the typing guard so a future coupon attempt is tracked
+    hasTrackedTyping.current = false;
 
     if (analytics) {
       trackCouponApplied(analytics, {

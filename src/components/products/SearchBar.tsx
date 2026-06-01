@@ -1,46 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-import { trackProductsSearched, useRudderAnalytics } from '@/lib/analytics';
+import { useState } from 'react';
 
 interface SearchBarProps {
   onSearch: (term: string) => void;
 }
 
+// Tracking for Products Searched (including results_count) is handled in
+// ProductGrid, which has visibility into the filtered results count.
 export function SearchBar({ onSearch }: SearchBarProps): React.JSX.Element {
-  const analytics = useRudderAnalytics();
   const [value, setValue] = useState('');
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const debouncedTrack = useCallback(
-    (query: string) => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-
-      debounceTimer.current = setTimeout(() => {
-        if (query.trim() && analytics) {
-          trackProductsSearched(analytics, { query: query.trim() });
-        }
-      }, 300);
-    },
-    [analytics],
-  );
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const newValue = e.target.value;
     setValue(newValue);
     onSearch(newValue);
-    debouncedTrack(newValue);
   }
 
   return (

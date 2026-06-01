@@ -80,6 +80,7 @@ export interface PromotionPayload {
 
 export interface SearchPayload {
   query: string;
+  results_count: number;
 }
 
 export interface IdentifyTraits {

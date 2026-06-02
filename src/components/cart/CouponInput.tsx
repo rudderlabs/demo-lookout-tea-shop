@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntryStarted,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,8 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+  // Guard: fire Coupon Entry Started only on the first keystroke per entry session.
+  const entryTracked = useRef(false);
 
   function handleApply(): void {
     setError('');
@@ -93,6 +96,8 @@ export function CouponInput(): React.JSX.Element {
 
     applyCoupon(found);
     setCode('');
+    // Reset guard so a future entry attempt fires the event again.
+    entryTracked.current = false;
 
     if (analytics) {
       trackCouponApplied(analytics, {
@@ -148,7 +153,19 @@ export function CouponInput(): React.JSX.Element {
           type="text"
           value={code}
           onChange={(e) => {
-            setCode(e.target.value);
+            const val = e.target.value;
+            // Fire Coupon Entry Started on the first keystroke only.
+            if (!entryTracked.current && val.length > 0) {
+              entryTracked.current = true;
+              if (analytics) {
+                trackCouponEntryStarted(analytics, { cart_value: subtotal });
+              }
+            }
+            // Reset guard when the field is cleared so re-entry fires the event again.
+            if (val === '') {
+              entryTracked.current = false;
+            }
+            setCode(val);
             setError('');
           }}
           onKeyDown={(e) => {

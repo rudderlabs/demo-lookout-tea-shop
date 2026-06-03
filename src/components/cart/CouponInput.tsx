@@ -52,14 +52,7 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
-  const entryStartedFired = useRef(false);
-
-  function handleFocus(): void {
-    if (!entryStartedFired.current && analytics) {
-      entryStartedFired.current = true;
-      trackCouponEntryStarted(analytics, { cart_value: subtotal });
-    }
-  }
+  const entryTracked = useRef(false);
 
   function handleApply(): void {
     setError('');
@@ -115,7 +108,7 @@ export function CouponInput(): React.JSX.Element {
   function handleRemoveCoupon(): void {
     removeCoupon();
     setError('');
-    entryStartedFired.current = false;
+    entryTracked.current = false;
   }
 
   if (coupon) {
@@ -158,10 +151,14 @@ export function CouponInput(): React.JSX.Element {
           type="text"
           value={code}
           onChange={(e) => {
-            setCode(e.target.value);
+            const val = e.target.value;
+            setCode(val);
             setError('');
+            if (!entryTracked.current && val.trim().length > 0 && analytics) {
+              entryTracked.current = true;
+              trackCouponEntryStarted(analytics);
+            }
           }}
-          onFocus={handleFocus}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
           }}

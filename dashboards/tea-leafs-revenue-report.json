@@ -1,0 +1,91 @@
+{
+  "id": "8811f576-3201-4907-a71b-0f4ab899b843",
+  "slug": "tea-leafs-revenue-report",
+  "title": "Tea Leafs Revenue Report",
+  "description": "3-month revenue overview for Tea Leafs — total revenue, order count, AOV, daily trends, weekly revenue, and checkout flow breakdown.",
+  "url": "https://lookout.rudderstack.com/w/sf-demo/d/tea-leafs-revenue-report",
+  "spec": {
+    "parameters": [
+      {
+        "name": "time_range",
+        "label": "Date Range",
+        "type": "time_range",
+        "required": true,
+        "default": "last_3_months"
+      }
+    ],
+    "panels": [
+      {
+        "id": "total-revenue",
+        "title": "Total Revenue",
+        "type": "metric",
+        "sql": "SELECT ROUND(SUM(TOTAL), 2) FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}}",
+        "metricConfig": { "format": "currency", "prefix": "$" },
+        "width": "half",
+        "order": 1
+      },
+      {
+        "id": "total-orders",
+        "title": "Total Orders",
+        "type": "metric",
+        "sql": "SELECT COUNT(*) FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}}",
+        "metricConfig": { "format": "number", "suffix": " orders" },
+        "width": "half",
+        "order": 2
+      },
+      {
+        "id": "avg-order-value",
+        "title": "Average Order Value",
+        "type": "metric",
+        "sql": "SELECT ROUND(AVG(TOTAL), 2) FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}}",
+        "metricConfig": { "format": "currency", "prefix": "$" },
+        "width": "half",
+        "order": 3
+      },
+      {
+        "id": "daily-revenue-trend",
+        "title": "Daily Revenue Trend",
+        "type": "chart",
+        "chartType": "area",
+        "sql": "SELECT DATE_TRUNC('day', TIMESTAMP)::DATE AS Day, ROUND(SUM(TOTAL), 2) AS Revenue FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}} GROUP BY 1 ORDER BY 1",
+        "width": "full",
+        "order": 4
+      },
+      {
+        "id": "weekly-revenue-trend",
+        "title": "Weekly Revenue",
+        "type": "chart",
+        "chartType": "bar",
+        "sql": "SELECT DATE_TRUNC('week', TIMESTAMP)::DATE AS Week, ROUND(SUM(TOTAL), 2) AS Revenue FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}} GROUP BY 1 ORDER BY 1",
+        "width": "full",
+        "order": 5
+      },
+      {
+        "id": "revenue-by-flow",
+        "title": "Revenue by Checkout Flow",
+        "type": "chart",
+        "chartType": "bar",
+        "sql": "SELECT COALESCE(CHECKOUT_FLOW, 'standard') AS Flow, ROUND(SUM(TOTAL), 2) AS Revenue FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}} GROUP BY 1 ORDER BY 2 DESC",
+        "width": "half",
+        "order": 6
+      },
+      {
+        "id": "orders-by-flow",
+        "title": "Orders by Checkout Flow",
+        "type": "chart",
+        "chartType": "pie",
+        "sql": "SELECT COALESCE(CHECKOUT_FLOW, 'standard') AS Flow, COUNT(*) AS Orders FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}} GROUP BY 1",
+        "width": "half",
+        "order": 7
+      },
+      {
+        "id": "daily-breakdown-table",
+        "title": "Daily Breakdown",
+        "type": "table",
+        "sql": "SELECT DATE_TRUNC('day', TIMESTAMP)::DATE AS Date, COUNT(*) AS Orders, ROUND(SUM(TOTAL), 2) AS \"Total Revenue\", ROUND(AVG(TOTAL), 2) AS \"Avg Order Value\", ROUND(SUM(DISCOUNT), 2) AS \"Total Discounts\", ROUND(SUM(SHIPPING), 2) AS \"Total Shipping\" FROM TEA_LEAFS_WEB.ORDER_COMPLETED WHERE TIMESTAMP >= {{time_range_start}} AND TIMESTAMP <= {{time_range_end}} GROUP BY 1 ORDER BY 1 DESC",
+        "width": "full",
+        "order": 8
+      }
+    ]
+  }
+}

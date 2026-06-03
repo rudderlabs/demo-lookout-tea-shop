@@ -132,6 +132,13 @@ export function trackCartViewed(
   analytics.track(ECOMMERCE_EVENTS.CART_VIEWED, toApiObject(payload));
 }
 
+export function trackCouponEntryStarted(
+  analytics: RudderAnalytics,
+): void {
+  console.log('[Analytics]', ECOMMERCE_EVENTS.COUPON_ENTRY_STARTED);
+  analytics.track(ECOMMERCE_EVENTS.COUPON_ENTRY_STARTED, {});
+}
+
 export function trackCouponApplied(
   analytics: RudderAnalytics,
   payload: CouponPayload,

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -51,6 +52,14 @@ export function CouponInput(): React.JSX.Element {
   const [error, setError] = useState('');
   const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
   const analytics = useRudderAnalytics();
+  const hasTrackedEntry = useRef(false);
+
+  function handleFocus(): void {
+    if (!hasTrackedEntry.current && analytics) {
+      hasTrackedEntry.current = true;
+      trackCouponEntered(analytics, { cart_value: subtotal });
+    }
+  }
 
   function handleApply(): void {
     setError('');
@@ -151,6 +160,7 @@ export function CouponInput(): React.JSX.Element {
             setCode(e.target.value);
             setError('');
           }}
+          onFocus={handleFocus}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
           }}

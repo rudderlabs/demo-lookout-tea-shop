@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from 'react';
 
 import type { CartItem, Coupon, TeaProduct } from '@/data/schema';
@@ -17,6 +18,7 @@ import type { CartState } from './types';
 const STORAGE_KEY = 'serene-leaf-cart';
 
 interface CartContextValue {
+  cartId: string;
   items: CartItem[];
   coupon: Coupon | null;
   isHydrated: boolean;
@@ -67,12 +69,20 @@ function loadCartFromStorage(): Omit<CartState, 'isHydrated'> {
   }
 }
 
+function generateCartId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 export function CartProvider({
   children,
 }: {
   children: React.ReactNode;
 }): React.JSX.Element {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
+  const [cartId] = useState<string>(() => generateCartId());
 
   // Load persisted cart on mount
   useEffect(() => {
@@ -155,6 +165,7 @@ export function CartProvider({
 
   const value = useMemo<CartContextValue>(
     () => ({
+      cartId,
       items: state.items,
       coupon: state.coupon,
       isHydrated: state.isHydrated,
@@ -170,6 +181,7 @@ export function CartProvider({
       clearCart,
     }),
     [
+      cartId,
       state.items,
       state.coupon,
       state.isHydrated,

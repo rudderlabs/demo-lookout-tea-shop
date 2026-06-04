@@ -7,7 +7,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
+  useState,
 } from 'react';
 
 import type { CartItem, Coupon, TeaProduct } from '@/data/schema';
@@ -82,7 +82,7 @@ export function CartProvider({
   children: React.ReactNode;
 }): React.JSX.Element {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
-  const cartIdRef = useRef<string>(generateCartId());
+  const [cartId] = useState<string>(() => generateCartId());
 
   // Load persisted cart on mount
   useEffect(() => {
@@ -165,7 +165,7 @@ export function CartProvider({
 
   const value = useMemo<CartContextValue>(
     () => ({
-      cartId: cartIdRef.current,
+      cartId,
       items: state.items,
       coupon: state.coupon,
       isHydrated: state.isHydrated,
@@ -181,6 +181,7 @@ export function CartProvider({
       clearCart,
     }),
     [
+      cartId,
       state.items,
       state.coupon,
       state.isHydrated,

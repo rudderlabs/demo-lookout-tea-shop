@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { coupons } from '@/data/coupons';
 import { useCart } from '@/lib/cart';
 import {
   trackCouponApplied,
   trackCouponDenied,
+  trackCouponEntryStarted,
   useRudderAnalytics,
 } from '@/lib/analytics';
 import { Button } from '@/components/shared/Button';
@@ -49,8 +50,18 @@ function CloseIcon(): React.JSX.Element {
 export function CouponInput(): React.JSX.Element {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
-  const { coupon, applyCoupon, removeCoupon, subtotal } = useCart();
+  const { coupon, applyCoupon, removeCoupon, subtotal, cartId } = useCart();
   const analytics = useRudderAnalytics();
+  const entryTracked = useRef(false);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    setCode(e.target.value);
+    setError('');
+    if (!entryTracked.current && e.target.value.length > 0 && analytics) {
+      entryTracked.current = true;
+      trackCouponEntryStarted(analytics, { cart_id: cartId ?? '' });
+    }
+  }
 
   function handleApply(): void {
     setError('');
@@ -93,6 +104,7 @@ export function CouponInput(): React.JSX.Element {
 
     applyCoupon(found);
     setCode('');
+    entryTracked.current = false;
 
     if (analytics) {
       trackCouponApplied(analytics, {
@@ -106,6 +118,7 @@ export function CouponInput(): React.JSX.Element {
   function handleRemoveCoupon(): void {
     removeCoupon();
     setError('');
+    entryTracked.current = false;
   }
 
   if (coupon) {
@@ -147,10 +160,7 @@ export function CouponInput(): React.JSX.Element {
           id="coupon-code"
           type="text"
           value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            setError('');
-          }}
+          onChange={handleChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleApply();
           }}

@@ -13,6 +13,7 @@ import type {
   CouponPayload,
   IdentifyTraits,
   OrderCompletedPayload,
+  PaymentErrorPayload,
   PaymentInfoPayload,
   ProductListPayload,
   ProductPayload,
@@ -191,6 +192,14 @@ export function trackPaymentInfoEntered(
     ECOMMERCE_EVENTS.PAYMENT_INFO_ENTERED,
     toApiObject(payload),
   );
+}
+
+export function trackPaymentError(
+  analytics: RudderAnalytics,
+  payload: PaymentErrorPayload,
+): void {
+  console.log('[Analytics]', ECOMMERCE_EVENTS.PAYMENT_ERROR, payload);
+  analytics.track(ECOMMERCE_EVENTS.PAYMENT_ERROR, toApiObject(payload));
 }
 
 export function trackOrderCompleted(

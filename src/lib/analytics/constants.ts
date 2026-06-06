@@ -17,6 +17,7 @@ export const ECOMMERCE_EVENTS = {
   CHECKOUT_STEP_VIEWED: 'Checkout Step Viewed',
   CHECKOUT_STEP_COMPLETED: 'Checkout Step Completed',
   PAYMENT_INFO_ENTERED: 'Payment Info Entered',
+  PAYMENT_ERROR: 'Payment Error',
   ORDER_COMPLETED: 'Order Completed',
   PROMOTION_VIEWED: 'Promotion Viewed',
   PROMOTION_CLICKED: 'Promotion Clicked',

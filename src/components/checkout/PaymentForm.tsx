@@ -7,6 +7,7 @@ import { getCurrentDemoPersona, selectRandomDemoPersona } from '@/data/demo-pers
 import {
   trackCheckoutStepCompleted,
   trackCheckoutStepViewed,
+  trackPaymentError,
   trackPaymentInfoEntered,
   useRudderAnalytics,
 } from '@/lib/analytics';
@@ -122,7 +123,31 @@ export function PaymentForm({
 
   function handleSubmit(e: React.FormEvent): void {
     e.preventDefault();
-    if (!validate()) return;
+    const newErrors: Partial<Record<keyof PaymentData, string>> = {};
+
+    if (form.cardNumber.replace(/\s/g, '').length < 16)
+      newErrors.cardNumber = 'Card number must be 16 digits';
+    if (!form.expiry.trim() || form.expiry.length < 5)
+      newErrors.expiry = 'Valid expiry required (MM/YY)';
+    if (!form.cvc.trim() || form.cvc.length < 3)
+      newErrors.cvc = 'CVC must be 3 digits';
+    if (!form.cardHolder.trim())
+      newErrors.cardHolder = 'Card holder name is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      if (analytics) {
+        trackPaymentError(analytics, {
+          checkout_id: checkoutId,
+          order_id: orderId,
+          error_fields: Object.keys(newErrors),
+          error_messages: Object.values(newErrors) as string[],
+          error_count: Object.keys(newErrors).length,
+          payment_method: 'credit_card',
+        });
+      }
+      return;
+    }
 
     if (analytics) {
       trackPaymentInfoEntered(analytics, {

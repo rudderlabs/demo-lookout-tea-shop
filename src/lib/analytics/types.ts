@@ -51,6 +51,15 @@ export interface PaymentInfoPayload {
   payment_method: string;
 }
 
+export interface PaymentErrorPayload {
+  checkout_id: string;
+  order_id: string;
+  error_fields: string[];
+  error_messages: string[];
+  error_count: number;
+  payment_method: string;
+}
+
 export interface OrderCompletedPayload {
   order_id: string;
   total: number;

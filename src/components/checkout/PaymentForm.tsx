@@ -105,22 +105,6 @@ export function PaymentForm({
     return digits;
   }
 
-  function validate(): boolean {
-    const newErrors: Partial<Record<keyof PaymentData, string>> = {};
-
-    if (form.cardNumber.replace(/\s/g, '').length < 16)
-      newErrors.cardNumber = 'Card number must be 16 digits';
-    if (!form.expiry.trim() || form.expiry.length < 5)
-      newErrors.expiry = 'Valid expiry required (MM/YY)';
-    if (!form.cvc.trim() || form.cvc.length < 3)
-      newErrors.cvc = 'CVC must be 3 digits';
-    if (!form.cardHolder.trim())
-      newErrors.cardHolder = 'Card holder name is required';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
-
   function handleSubmit(e: React.FormEvent): void {
     e.preventDefault();
     const newErrors: Partial<Record<keyof PaymentData, string>> = {};

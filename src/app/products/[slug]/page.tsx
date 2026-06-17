@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ProductActions } from '@/components/product-detail/ProductActions';
 import { BrewingGuide } from '@/components/product-detail/BrewingGuide';
 import { ProductInfo } from '@/components/product-detail/ProductInfo';
+import { ShareButton } from '@/components/product-detail/ShareButton';
 import { WishlistButton } from '@/components/product-detail/WishlistButton';
 import { products } from '@/data/products';
 
@@ -33,6 +34,7 @@ export default async function ProductPage({
           <ProductActions product={product} />
         </div>
         <WishlistButton product={product} />
+        <ShareButton product={product} />
       </div>
 
       <div className="mt-12">

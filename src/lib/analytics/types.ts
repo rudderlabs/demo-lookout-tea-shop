@@ -16,6 +16,11 @@ export interface CartProductPayload extends ProductPayload {
   checkout_flow?: string;
 }
 
+export interface ProductSharedPayload extends ProductPayload {
+  /** 'native' = Web Share API (mobile OS sheet); 'copy_link' = clipboard fallback */
+  share_method: 'native' | 'copy_link';
+}
+
 export interface ProductListPayload {
   list_id: string;
   category: string;

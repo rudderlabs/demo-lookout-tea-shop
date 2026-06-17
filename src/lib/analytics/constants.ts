@@ -10,6 +10,7 @@ export const ECOMMERCE_EVENTS = {
   PRODUCT_ADDED: 'Product Added',
   PRODUCT_REMOVED: 'Product Removed',
   PRODUCT_ADDED_TO_WISHLIST: 'Product Added to Wishlist',
+  PRODUCT_SHARED: 'Product Shared',
   CART_VIEWED: 'Cart Viewed',
   COUPON_APPLIED: 'Coupon Applied',
   COUPON_DENIED: 'Coupon Denied',

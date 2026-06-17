@@ -16,6 +16,7 @@ import type {
   PaymentInfoPayload,
   ProductListPayload,
   ProductPayload,
+  ProductSharedPayload,
   PromotionPayload,
   SearchPayload,
 } from './types';
@@ -122,6 +123,14 @@ export function trackProductAddedToWishlist(
     ECOMMERCE_EVENTS.PRODUCT_ADDED_TO_WISHLIST,
     toApiObject(payload),
   );
+}
+
+export function trackProductShared(
+  analytics: RudderAnalytics,
+  payload: ProductSharedPayload,
+): void {
+  console.log('[Analytics]', ECOMMERCE_EVENTS.PRODUCT_SHARED, payload);
+  analytics.track(ECOMMERCE_EVENTS.PRODUCT_SHARED, toApiObject(payload));
 }
 
 export function trackCartViewed(

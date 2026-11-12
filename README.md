@@ -103,4 +103,3 @@ Without credentials, the app runs in dry-run mode — events are logged to the c
 ## CI
 
 - **CI workflow** — Runs typecheck, lint, knip, and build on every PR and push to main
-- **Rudder AI Reviewer** — Automated RudderStack event review on PRs (requires `RUDDERSTACK_SOURCE_ID` and `RUDDERSTACK_SERVICE_ACCESS_TOKEN` repository secrets)
